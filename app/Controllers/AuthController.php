@@ -61,9 +61,9 @@ class AuthController extends BaseController
         }
 
         $data = [
-            'username' => $this->request->getPost('username'),
-            'password' => $this->request->getPost('password'),
-            'role_id'  => $this->request->getPost('role_id'),
+            'username'      => $this->request->getPost('username'),
+            'password_hash' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'role_id'       => $this->request->getPost('role_id'),
         ];
 
         $userModel->insert($data);
