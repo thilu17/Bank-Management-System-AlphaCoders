@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMS - Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .navbar {
+            background: #2a2a40;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .navbar h2 { font-weight: 600; font-size: 20px; color: #4facfe; }
+
+        .btn-logout {
+            padding: 8px 15px;
+            background: rgba(255, 77, 79, 0.1);
+            border: 1px solid #ff4d4f;
+            border-radius: 5px;
+            color: #ff4d4f;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #ff4d4f;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .welcome-card h1 { margin-bottom: 10px; color: #1e1e2f; }
+        .welcome-card p { color: #666; font-size: 16px; }
+        .role-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            color: #096dd9;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .alert {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .alert-error { background: rgba(255, 77, 79, 0.1); border: 1px solid #ff4d4f; color: #ff4d4f; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <h2>BMS Dashboard</h2>
+        <div>
+            <a href="<?= base_url('logout') ?>" class="btn-logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <?php if(session()->getFlashdata('error')): ?>
+            <div class="alert alert-error"><?= session()->getFlashdata('error') ?></div>
+        <?php endif; ?>
+
+        <div class="welcome-card">
+            <h1>Welcome, <?= esc($username) ?>!</h1>
+            <p>You have successfully logged into the Bank Management System.</p>
+            <div class="role-badge">Role: <?= esc($role) ?></div>
+        </div>
+    </div>
+
+</body>
+</html>
