@@ -20,9 +20,11 @@ $routes->group('api/v1', static function ($routes) {
     $routes->post('auth/login', 'Api\AuthApi::login');
     $routes->post('auth/signup', 'Api\AuthApi::signup');
 
-    // FD Products
-    $routes->get('fd-products', 'Api\FdProductApi::index');
-    $routes->post('fd-products', 'Api\FdProductApi::create');
-    $routes->put('fd-products/(:num)', 'Api\FdProductApi::update/$1');
-    $routes->patch('fd-products/(:num)/toggle', 'Api\FdProductApi::toggle/$1');
+    // FD Products: Branch Manager / Super Admin only
+    $routes->group('fd-products', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']], static function ($routes) {
+        $routes->get('/', 'Api\FdProductApi::index');
+        $routes->post('/', 'Api\FdProductApi::create');
+        $routes->put('(:num)', 'Api\FdProductApi::update/$1');
+        $routes->patch('(:num)/toggle', 'Api\FdProductApi::toggle/$1');
+    });
 });
