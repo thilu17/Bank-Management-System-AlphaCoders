@@ -24,6 +24,16 @@ $routes->group('loans/products', ['filter' => ['auth', 'role:Branch Manager,SUPE
     $routes->get('delete/(:num)', 'LoanProductController::delete/$1');
 });
 
+// Loan Applications Web Routes (Loan Officer, Branch Manager, Super Admin)
+$routes->group('loans/applications', ['filter' => ['auth', 'role:Loan Officer,Branch Manager,SUPER ADMIN']], static function ($routes) {
+    $routes->get('/', 'LoanApplicationController::index');
+    $routes->get('view/(:num)', 'LoanApplicationController::view/$1');
+});
+$routes->group('loans/apply', ['filter' => ['auth', 'role:Loan Officer,Branch Manager,SUPER ADMIN']], static function ($routes) {
+    $routes->get('/', 'LoanApplicationController::apply');
+    $routes->post('/', 'LoanApplicationController::submit');
+});
+
 // API Routes
 $routes->group('api/v1', static function ($routes) {
     $routes->post('auth/login', 'Api\AuthApi::login');
@@ -45,5 +55,12 @@ $routes->group('api/v1', static function ($routes) {
         $routes->put('(:num)', 'Api\LoanProductApi::update/$1');
         $routes->patch('(:num)/toggle', 'Api\LoanProductApi::toggle/$1');
         $routes->delete('(:num)', 'Api\LoanProductApi::delete/$1');
+    });
+
+    // Loan Applications API
+    $routes->group('loan-applications', ['filter' => ['auth', 'role:Loan Officer,Branch Manager,SUPER ADMIN']], static function ($routes) {
+        $routes->get('/', 'Api\LoanApplicationApi::index');
+        $routes->get('(:num)', 'Api\LoanApplicationApi::show/$1');
+        $routes->post('/', 'Api\LoanApplicationApi::create');
     });
 });

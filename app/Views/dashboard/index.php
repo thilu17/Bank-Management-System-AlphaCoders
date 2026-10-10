@@ -100,11 +100,31 @@
 
         <?php if (in_array($role, ['SUPER ADMIN', 'Branch Manager', 'Loan Officer'])): ?>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 24px;">
-                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 4px solid #4361ee;">
-                    <h3 style="font-size: 17px; margin-bottom: 8px; color: #1e1e2f;">Loan Product Engine</h3>
-                    <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Configure loan types, interest rates, simple vs compound rules, and limits.</p>
-                    <a href="<?= base_url('loans/products') ?>" style="display: inline-block; padding: 8px 16px; background: #4361ee; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600;">Manage Loan Products &rarr;</a>
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 4px solid #4361ee; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="font-size: 17px; margin-bottom: 8px; color: #1e1e2f;">Loan Applications Queue</h3>
+                        <p style="color: #666; font-size: 13px; margin-bottom: 16px;">View all pending loan applications, credit appraisals, and underwriting statuses.</p>
+                    </div>
+                    <a href="<?= base_url('loans/applications') ?>" style="display: inline-block; padding: 8px 16px; background: #4361ee; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; width: fit-content;">View Applications &rarr;</a>
                 </div>
+
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 4px solid #10b981; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="font-size: 17px; margin-bottom: 8px; color: #1e1e2f;">Submit Loan Application</h3>
+                        <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Create a multi-step credit application with collateral, guarantors, and KYC uploads.</p>
+                    </div>
+                    <a href="<?= base_url('loans/apply') ?>" style="display: inline-block; padding: 8px 16px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; width: fit-content;">Apply for Loan &rarr;</a>
+                </div>
+
+                <?php if (in_array($role, ['SUPER ADMIN', 'Branch Manager'])): ?>
+                    <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 4px solid #7209b7; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h3 style="font-size: 17px; margin-bottom: 8px; color: #1e1e2f;">Loan Product Engine</h3>
+                            <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Configure loan types, interest rates, simple vs compound rules, and limits.</p>
+                        </div>
+                        <a href="<?= base_url('loans/products') ?>" style="display: inline-block; padding: 8px 16px; background: #7209b7; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; width: fit-content;">Manage Loan Products &rarr;</a>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
     </div>
