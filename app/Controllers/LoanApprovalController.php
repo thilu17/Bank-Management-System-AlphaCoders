@@ -6,13 +6,16 @@ use App\Controllers\BaseController;
 use App\Models\LoanApplicationModel;
 use App\Models\LoanProductModel;
 use App\Models\LoanModel;
+use App\Models\LoanRepaymentScheduleModel;
 use App\Services\LedgerService;
+use App\Services\EmiCalculatorService;
 
 class LoanApprovalController extends BaseController
 {
     protected LoanApplicationModel $applicationModel;
     protected LoanProductModel $productModel;
     protected LoanModel $loanModel;
+    protected LoanRepaymentScheduleModel $scheduleModel;
     protected LedgerService $ledgerService;
 
     public function __construct()
@@ -20,6 +23,7 @@ class LoanApprovalController extends BaseController
         $this->applicationModel = new LoanApplicationModel();
         $this->productModel     = new LoanProductModel();
         $this->loanModel        = new LoanModel();
+        $this->scheduleModel    = new LoanRepaymentScheduleModel();
         $this->ledgerService    = new LedgerService();
     }
 
@@ -73,14 +77,17 @@ class LoanApprovalController extends BaseController
         $this->loanModel->insert($loanData);
         $newLoanId = $this->loanModel->getInsertID();
 
-        // 3. Update Application Status to Disbursed / Approved
+        // 3. Generate & Save EMI Repayment Schedule into Database
+        EmiCalculatorService::generateAndSaveSchedule($newLoanId);
+
+        // 4. Update Application Status to Disbursed / Approved
         $this->applicationModel->update($applicationId, [
             'status'     => 'Disbursed',
             'remarks'    => ($application['remarks'] ? $application['remarks'] . "\n" : '') . "Approved & Disbursed by Manager on " . date('Y-m-d H:i'),
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
-        // 4. Trigger Ledger Service (Dual Entry: Credit Savings & Debit Loan GL)
+        // 5. Trigger Ledger Service (Dual Entry: Credit Savings & Debit Loan GL)
         $this->ledgerService->disburseLoanToSavings(
             (int)$application['customer_id'],
             (float)$application['amount_requested'],
@@ -89,7 +96,7 @@ class LoanApprovalController extends BaseController
         );
 
         return redirect()->to('/loans/applications/view/' . $applicationId)
-                         ->with('success', "Loan Application {$application['application_no']} approved successfully! Loan Account {$loanAccountNo} is now Active and funds have been disbursed to Customer Savings.");
+                         ->with('success', "Loan Application {$application['application_no']} approved successfully! Loan Account {$loanAccountNo} is now Active and amortization schedule has been generated.");
     }
 
     /**
@@ -133,5 +140,32 @@ class LoanApprovalController extends BaseController
         ];
 
         return view('loans/index', $data);
+    }
+
+    /**
+     * View Amortization Repayment Schedule for a Disbursed Loan
+     */
+    public function schedule($loanId = null)
+    {
+        $loan = $this->loanModel->getDetailedLoan((int)$loanId);
+        if (!$loan) {
+            return redirect()->to('/loans/active')->with('error', 'Loan account not found.');
+        }
+
+        $schedules = $this->scheduleModel->getScheduleForLoan((int)$loanId);
+        if (empty($schedules)) {
+            // Auto generate if missing
+            EmiCalculatorService::generateAndSaveSchedule((int)$loanId);
+            $schedules = $this->scheduleModel->getScheduleForLoan((int)$loanId);
+        }
+
+        $data = [
+            'username'  => session()->get('username'),
+            'role'      => session()->get('role'),
+            'loan'      => $loan,
+            'schedules' => $schedules,
+        ];
+
+        return view('loans/schedule', $data);
     }
 }

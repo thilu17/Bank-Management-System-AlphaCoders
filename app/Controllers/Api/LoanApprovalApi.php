@@ -7,6 +7,7 @@ use App\Models\LoanApplicationModel;
 use App\Models\LoanProductModel;
 use App\Models\LoanModel;
 use App\Services\LedgerService;
+use App\Services\EmiCalculatorService;
 use CodeIgniter\API\ResponseTrait;
 
 class LoanApprovalApi extends BaseController
@@ -77,6 +78,9 @@ class LoanApprovalApi extends BaseController
         $this->loanModel->insert($loanData);
         $newLoanId = $this->loanModel->getInsertID();
 
+        // Generate and save repayment schedule
+        $scheduleResult = EmiCalculatorService::generateAndSaveSchedule($newLoanId);
+
         // Update application
         $this->applicationModel->update($id, [
             'status'     => 'Disbursed',
@@ -94,8 +98,9 @@ class LoanApprovalApi extends BaseController
 
         return $this->respond([
             'status'         => 200,
-            'message'        => 'Loan application approved and funds disbursed successfully.',
+            'message'        => 'Loan application approved, schedule created, and funds disbursed successfully.',
             'loan'           => $this->loanModel->getDetailedLoan($newLoanId),
+            'schedule_count' => count($scheduleResult['schedule'] ?? []),
             'ledger_receipt' => $ledgerReceipt,
         ]);
     }

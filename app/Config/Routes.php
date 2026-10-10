@@ -38,6 +38,7 @@ $routes->group('loans/apply', ['filter' => ['auth', 'role:Loan Officer,Branch Ma
 $routes->post('loans/applications/approve/(:num)', 'LoanApprovalController::approve/$1', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']]);
 $routes->post('loans/applications/reject/(:num)', 'LoanApprovalController::reject/$1', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']]);
 $routes->get('loans/active', 'LoanApprovalController::activeLoans', ['filter' => 'auth']);
+$routes->get('loans/schedule/(:num)', 'LoanApprovalController::schedule/$1', ['filter' => 'auth']);
 
 // API Routes
 $routes->group('api/v1', static function ($routes) {
@@ -71,6 +72,8 @@ $routes->group('api/v1', static function ($routes) {
         $routes->post('(:num)/reject', 'Api\LoanApprovalApi::reject/$1', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']]);
     });
 
-    // Active Loans API
+    // Active Loans & Schedule API
     $routes->get('loans/active', 'Api\LoanApprovalApi::activeLoans', ['filter' => 'auth']);
+    $routes->post('loans/preview-emi', 'Api\LoanEmiApi::previewEmi');
+    $routes->get('loans/(:num)/schedule', 'Api\LoanEmiApi::getSchedule/$1', ['filter' => 'auth']);
 });

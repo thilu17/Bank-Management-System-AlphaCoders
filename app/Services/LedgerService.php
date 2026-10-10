@@ -19,7 +19,7 @@ class LedgerService
      * - DEBIT: Loan Disbursement Asset GL Account (GL-10400)
      * - CREDIT: Customer Savings Account / Customer GL (GL-20100)
      */
-    public function disburseLoanToSavings(int $customerId, float $amount, string $loanAccountNo, int $branchId = null): array
+    public function disburseLoanToSavings(int $customerId, float $amount, string $loanAccountNo, ?int $branchId = null): array
     {
         $txId = 'TX-DISB-' . date('YmdHis') . '-' . rand(100, 999);
         $timestamp = date('Y-m-d H:i:s');
