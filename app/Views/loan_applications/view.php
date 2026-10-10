@@ -498,11 +498,96 @@
             <?php endif; ?>
         </div>
 
+        <!-- Manager Underwriting & Approval Decision Card -->
+        <?php if (in_array($role, ['Branch Manager', 'SUPER ADMIN']) && $application['status'] === 'Pending Review'): ?>
+            <div class="card" style="border: 2px solid var(--primary); background: linear-gradient(180deg, #ffffff, #f8fafc); margin-bottom: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h3 style="border-bottom: none; padding-bottom: 0; margin-bottom: 4px; color: var(--primary-dark);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Branch Manager Underwriting Decision</span>
+                        </h3>
+                        <p style="font-size: 13px; color: var(--text-muted);">Authorize disbursement and trigger Ledger Service to credit Customer Savings.</p>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <!-- Reject Button -->
+                        <button type="button" onclick="openRejectModal()" style="padding: 11px 20px; background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; border-radius: var(--radius-sm); font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                            <span>Reject Application</span>
+                        </button>
+
+                        <!-- Approve & Disburse Form -->
+                        <form method="POST" action="<?= base_url('loans/applications/approve/' . $application['id']) ?>" onsubmit="return confirm('Approve this loan for Rs. <?= number_format($application['amount_requested'], 2) ?> and disburse funds to Customer Savings immediately?');">
+                            <?= csrf_field() ?>
+                            <button type="submit" style="padding: 11px 24px; background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; border-radius: var(--radius-sm); font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); display: inline-flex; align-items: center; gap: 8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Approve & Disburse Funds</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php elseif ($application['status'] === 'Disbursed'): ?>
+            <div class="card" style="border: 1px solid #a7f3d0; background: #ecfdf5; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 16px; font-weight: 700; color: #065f46;">Loan Approved & Disbursed</h4>
+                        <p style="font-size: 13px; color: #047857;">Funds credited to customer savings account. Loan facility is now active.</p>
+                    </div>
+                </div>
+                <a href="<?= base_url('loans/active') ?>" class="btn-primary" style="padding: 8px 18px; font-size: 13px;">View in Active Portfolio &rarr;</a>
+            </div>
+        <?php endif; ?>
+
+        <!-- Rejection Reason Modal -->
+        <div id="rejectModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: white; border-radius: var(--radius-lg); max-width: 500px; width: 100%; box-shadow: var(--shadow-lg); overflow: hidden;">
+                <div style="padding: 20px 24px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 17px; font-weight: 700; color: #e11d48;">Reject Loan Application</h3>
+                    <button type="button" onclick="closeRejectModal()" style="background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);">&times;</button>
+                </div>
+                <form method="POST" action="<?= base_url('loans/applications/reject/' . $application['id']) ?>">
+                    <?= csrf_field() ?>
+                    <div style="padding: 24px;">
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Please provide the formal reason for rejecting this loan application:</p>
+                        <textarea name="rejection_reason" rows="3" style="width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 14px; font-family: inherit;" placeholder="e.g. Insufficient verifiable monthly income / Ineligible collateral value..." required></textarea>
+                    </div>
+                    <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" onclick="closeRejectModal()" style="padding: 8px 16px; border: 1px solid var(--border); background: white; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600;">Cancel</button>
+                        <button type="submit" style="padding: 8px 18px; background: #e11d48; color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600;">Confirm Rejection</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Back Button -->
         <div>
             <a href="<?= base_url('loans/applications') ?>" class="btn-back">&larr; Back to Applications Queue</a>
         </div>
     </div>
 
+    <script>
+        function openRejectModal() {
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

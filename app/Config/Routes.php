@@ -34,6 +34,11 @@ $routes->group('loans/apply', ['filter' => ['auth', 'role:Loan Officer,Branch Ma
     $routes->post('/', 'LoanApplicationController::submit');
 });
 
+// Loan Approval & Disbursement Actions (Branch Manager & Super Admin)
+$routes->post('loans/applications/approve/(:num)', 'LoanApprovalController::approve/$1', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']]);
+$routes->post('loans/applications/reject/(:num)', 'LoanApprovalController::reject/$1', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']]);
+$routes->get('loans/active', 'LoanApprovalController::activeLoans', ['filter' => 'auth']);
+
 // API Routes
 $routes->group('api/v1', static function ($routes) {
     $routes->post('auth/login', 'Api\AuthApi::login');
@@ -62,5 +67,10 @@ $routes->group('api/v1', static function ($routes) {
         $routes->get('/', 'Api\LoanApplicationApi::index');
         $routes->get('(:num)', 'Api\LoanApplicationApi::show/$1');
         $routes->post('/', 'Api\LoanApplicationApi::create');
+        $routes->post('(:num)/approve', 'Api\LoanApprovalApi::approve/$1', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']]);
+        $routes->post('(:num)/reject', 'Api\LoanApprovalApi::reject/$1', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']]);
     });
+
+    // Active Loans API
+    $routes->get('loans/active', 'Api\LoanApprovalApi::activeLoans', ['filter' => 'auth']);
 });
