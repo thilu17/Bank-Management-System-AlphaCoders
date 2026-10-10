@@ -97,6 +97,16 @@
             <p>You have successfully logged into the Bank Management System.</p>
             <div class="role-badge">Role: <?= esc($role) ?></div>
         </div>
+
+        <?php if (in_array($role, ['SUPER ADMIN', 'Branch Manager', 'Loan Officer'])): ?>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 24px;">
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 4px solid #4361ee;">
+                    <h3 style="font-size: 17px; margin-bottom: 8px; color: #1e1e2f;">Loan Product Engine</h3>
+                    <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Configure loan types, interest rates, simple vs compound rules, and limits.</p>
+                    <a href="<?= base_url('loans/products') ?>" style="display: inline-block; padding: 8px 16px; background: #4361ee; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600;">Manage Loan Products &rarr;</a>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 
 </body>
