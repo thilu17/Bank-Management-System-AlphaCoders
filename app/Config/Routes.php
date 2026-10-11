@@ -15,6 +15,24 @@ $routes->get('/logout', 'AuthController::logout');
 // Protected Web Routes
 $routes->get('/dashboard', 'Dashboard::index', ['filter' => 'auth']);
 
+$routes->group('ledger', ['filter' => 'auth'], static function ($routes) {
+    $routes->group('', ['filter' => 'role:Teller,Account Officer,Branch Manager,SUPER ADMIN'], static function ($routes) {
+        $routes->get('post', 'LedgerController::create');
+        $routes->post('post', 'LedgerController::store');
+    });
+
+    $routes->group('', ['filter' => 'role:Teller,Account Officer,Branch Manager,SUPER ADMIN,Auditor'], static function ($routes) {
+        $routes->get('/', 'LedgerController::index');
+        $routes->get('chart', 'LedgerController::chart');
+        $routes->get('(:num)', 'LedgerController::show/$1');
+    });
+});
+
+$routes->group('transfers', ['filter' => ['auth', 'role:Teller,Account Officer,Branch Manager,SUPER ADMIN']], static function ($routes) {
+    $routes->get('/', 'TransferController::index');
+    $routes->post('/', 'TransferController::store');
+});
+
 // Loan Products Web Routes (Branch Manager & Super Admin)
 $routes->group('loans/products', ['filter' => ['auth', 'role:Branch Manager,SUPER ADMIN']], static function ($routes) {
     $routes->get('/', 'LoanProductController::index');

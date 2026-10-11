@@ -127,6 +127,32 @@
                 <?php endif; ?>
             </div>
         <?php endif; ?>
+
+        <?php
+            $canViewLedger = in_array($role, ['SUPER ADMIN', 'Branch Manager', 'Account Officer', 'Teller', 'Auditor'], true);
+            $canTransfer   = in_array($role, ['SUPER ADMIN', 'Branch Manager', 'Account Officer', 'Teller'], true);
+        ?>
+        <?php if ($canViewLedger): ?>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 24px;">
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 4px solid #0f172a; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="font-size: 17px; margin-bottom: 8px; color: #1e1e2f;">General Ledger</h3>
+                        <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Review posted journals and the chart of accounts. Every entry stays in balance.</p>
+                    </div>
+                    <a href="<?= base_url('ledger') ?>" style="display: inline-block; padding: 8px 16px; background: #0f172a; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; width: fit-content;">Open Ledger &rarr;</a>
+                </div>
+
+                <?php if ($canTransfer): ?>
+                    <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 4px solid #4361ee; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h3 style="font-size: 17px; margin-bottom: 8px; color: #1e1e2f;">Account Transfers</h3>
+                            <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Move funds between customer savings and current accounts with a double entry.</p>
+                        </div>
+                        <a href="<?= base_url('transfers') ?>" style="display: inline-block; padding: 8px 16px; background: #4361ee; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; width: fit-content;">New Transfer &rarr;</a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 
 </body>
